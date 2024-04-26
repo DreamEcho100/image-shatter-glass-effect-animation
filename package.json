@@ -1,0 +1,32 @@
+{
+	"name": "image-shatter-glass-effect-animation",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "tsc && vite build",
+		"preview": "vite preview"
+	},
+	"devDependencies": {
+		"typescript": "^5.2.2",
+		"vite": "^5.2.0"
+	},
+	"prettier": {
+		"semi": true,
+		"singleQuote": true,
+		"tabWidth": 2,
+		"useTabs": true,
+		"trailingComma": "all",
+		"printWidth": 120,
+		"endOfLine": "auto",
+		"arrowParens": "always",
+		"bracketSpacing": true,
+		"quoteProps": "as-needed",
+		"proseWrap": "preserve"
+	},
+	"dependencies": {
+		"delaunay": "^0.4.0",
+		"gsap": "^3.12.5"
+	}
+}
