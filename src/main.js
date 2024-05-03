@@ -45,8 +45,8 @@ container.innerHTML = `
 		}
 		
 		#container {
-				width: 485px;
-				height: 485px;
+				width: 740px;
+				height: 416px;
 				margin: auto;
 				max-width: 100%;
 				
@@ -59,7 +59,7 @@ container.innerHTML = `
 
 import Delaunator from 'delaunator';
 import { gsap, Cubic } from 'gsap';
-import html2canvas from 'html2canvas-pro';
+import html2canvas from 'html2canvas';
 
 // Constants
 const TWO_PI = Math.PI * 2;
@@ -265,8 +265,17 @@ function triangulate() {
 
 	for (let i = 0; i < store.vertices.length; i++) {
 		const vertex = store.vertices[i];
-		vertex[0] = clamp(vertex[0], 0, store.imageWidth);
-		vertex[1] = clamp(vertex[1], 0, store.imageHeight);
+		const min0 = Math.min(vertex[0], store.imageWidth);
+		const max0 = Math.max(vertex[0], store.imageWidth);
+
+		const min1 = Math.min(vertex[1], store.imageHeight);
+		const max1 = Math.max(vertex[1], store.imageHeight);
+
+		vertex[0] = clamp(min0, 0, max0);
+		vertex[1] = clamp(min1, 0, max1);
+
+		// vertex[0] = clamp(vertex[0], 0, store.imageWidth);
+		// vertex[1] = clamp(vertex[1], 0, store.imageHeight);
 	}
 
 	store.indices = [...new Delaunator(store.vertices.flat()).triangles];
@@ -347,7 +356,11 @@ function shatter(image) {
 		store.container.appendChild(fragment.canvas);
 	}
 
-	image.parentElement?.removeChild(image);
+	image.classList.add('opacity-0', 'pointer-events-none', 'transition-opacity', 'duration-1000', 'relative');
+	image.style.zIndex = '1000';
+	image.style.perspective = '500px';
+	image.style.perspectiveOrigin = '50% 50%';
+	// image.parentElement?.removeChild(image);
 	image.removeEventListener('click', imageClickHandler);
 }
 
@@ -373,8 +386,8 @@ function placeImage(transitionIn = true) {
 	store.image = new Image();
 	store.image.src = 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/175711/dj.jpg';
 
-	store.image.style.width = '485px';
-	store.image.style.height = '485px';
+	store.image.style.width = '740px';
+	store.image.style.height = '416px';
 
 	store.image.addEventListener('click', imageClickHandler);
 	store.container.appendChild(store.image);
@@ -397,9 +410,11 @@ function setupPlacedImage(transitionIn) {
  * @param {MouseEvent} event - The click event.
  */
 async function imageClickHandler(event) {
-	const screenshotDataURL = await takeScreenshot(store.container);
+	// console.time('takeScreenshot');
+	// const screenshotDataURL = await takeScreenshot(store.container);
+	// console.timeEnd('takeScreenshot');
 
-	store.image.src = screenshotDataURL;
+	// store.image.src = screenshotDataURL;
 
 	store.imageWidth = store.image.offsetWidth;
 	store.imageHeight = store.image.offsetHeight;
@@ -461,12 +476,17 @@ async function takeScreenshot(containerElement) {
 		useCORS: true,
 		logging: true,
 		// proxy
-	}).then((canvas) => {
-		// Get the data URL representation of the canvas
-		const img = canvas.toDataURL('image/png');
-		// .replace(/^data:image\/jpg/, 'data:application/octet-stream');
-		return img;
-	});
+	})
+		.then((canvas) => {
+			// Get the data URL representation of the canvas
+			const img = canvas.toDataURL('image/png').replace(/^data:image\/jpg/, 'data:application/octet-stream');
+			console.log('img', img);
+			return img;
+		})
+		.catch((err) => {
+			console.error(err);
+			throw err;
+		});
 }
 
 setup();
